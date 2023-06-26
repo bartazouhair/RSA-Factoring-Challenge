@@ -1,18 +1,21 @@
 #!/usr/bin/python3
-from sys import argv
+"""find these two primes p and q of given n, n = p x q"""
+import sys
+from math import ceil, sqrt
 
-with open(argv[1]) as f:
-    for line in f:
-        num = int(line)
-        print("{:d}=".format(num), end="")
-        if num % 2 == 0:
-            print("{}*2".format(num//2))
-            continue
-        for i in range(3, num, 2):
-            if num % i == 0:
-                factor = num//i
-                for j in range(3, factor, 2):
-                    if factor % j == 0 or i % j == 0:
-                        break
-                print("{}*{}".format(factor, i))
+with open(sys.argv[1], "r") as fp:
+    n = int(fp.readline())
+    # check if value is even
+    if n % 2 == 0:
+        print("{}={}*{}".format(n, int(n / 2), 2))
+    # value is odd number
+    else:
+        a = int(ceil(sqrt(n)))
+        while (True):
+            b1 = a * a - n
+            b = int(sqrt(b1))
+            if(b * b == b1):
                 break
+            else:
+                a += 1
+        print("{}={}*{}".format(n, a + b, a - b))
