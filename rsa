@@ -1,73 +1,48 @@
-#!/usr/bin/python3
-import random
+#!/usr/bin/env bash
 
-def is_prime(n):
-    if n <= 1:
-        return False
-    if n <= 3:
-        return True
-    if n % 2 == 0 or n % 3 == 0:
-        return False
-    i = 5
-    while i * i <= n:
-        if n % i == 0 or n % (i + 2) == 0:
-            return False
-        i += 6
-    return True
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
+        else
+                num2=$3
+        fi
 
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
 
-def generate_key_pair():
-    p = random_prime()
-    q = random_prime()
-    while p == q:
-        q = random_prime()
-    n = p * q
-    phi = (p - 1) * (q - 1)
-    e = 65537  # commonly chosen exponent
-    d = mod_inverse(e, phi)
-    return (e, n), (d, n)
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
 
+        echo "$num$num1*$num2"
+}
 
-def random_prime():
-    while True:
-        prime_candidate = random.getrandbits(1024)
-        if is_prime(prime_candidate):
-            return prime_candidate
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
+else
 
+        while read i
+        do
 
-def mod_inverse(a, m):
-    g, x, y = extended_gcd(a, m)
-    if g != 1:
-        raise ValueError("Inverse does not exist.")
-    return x % m
+                result=$(factor "$i")
+                check_factor $result
 
-
-def extended_gcd(a, b):
-    if a == 0:
-        return b, 0, 1
-    else:
-        gcd, x, y = extended_gcd(b % a, a)
-        return gcd, y - (b // a) * x, x
-
-
-def encrypt(message, public_key):
-    e, n = public_key
-    return pow(message, e, n)
-
-
-def decrypt(ciphertext, private_key):
-    d, n = private_key
-    return pow(ciphertext, d, n)
-
-
-# Example usage:
-plaintext = 42
-public_key, private_key = generate_key_pair()
-
-# Encryption
-ciphertext = encrypt(plaintext, public_key)
-print("Ciphertext:", ciphertext)
-
-# Decryption
-decrypted_message = decrypt(ciphertext, private_key)
-print("Decrypted message:", decrypted_message)
+        done < "$1"
+fi
