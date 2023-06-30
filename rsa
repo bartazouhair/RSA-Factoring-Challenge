@@ -1,60 +1,47 @@
-#!/usr/bin/env bash
-#is a challenge
-check_factor()
+#!/bin/bash
+
+is_factor()
 {
-	if [ $# -ne 3 ];
-        then
-                args=("$@")
-                count=0
-                num2=1
-                for a in ${args[*]};
-                do
-                        if [ $count -gt 1 ];
-                        then
-                                num2=$(echo $a*$num2 | bc)
-                        fi
-                        count=$((count + 1))
-                done
-        else
-                num2=$3
-        fi
+        if [ $# -ne 3 ]
+	then
+		args=("$@")
+		counter=0
+		number_2=0
+		for arg in ${args[*]}
+		do
+			if [ $counter -gt 1 ]
+			then
+				number_2=$(echo $arg*$number_2 | bc)
+			fi
+			counter=$((counter + 1))
+		done
+	else
+		number_2=$3
+	fi
 
-        num1=$2
-        num=$(echo "$1" | tr ':' '=')
+	number_1=$2
+	number=$(echo "$1" | tr ':' '=')
 
-        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
-	        if ((result == 1)); then
-		        numcp=$num1
-		        num1=$num2
-		        num2=$numcp
-                fi
+	result=$(echo "if($number_2 > $number_1) 1 else 0" | bc)
 
-        echo "$num$num1*$num2"
+	if ((result == 1))
+	then
+		tmp=$number_1
+		number_1=$number_2
+		number_2=$tmp
+	fi
+
+	echo "$number$number_1*$number_2"
 }
 
 if [ $# -ne 1 ]
 then
-        echo 'Usage: rsa <file>'
-        exit 1
+	echo 'Usage: rsa <file>'
+	exit 1
 else
-
-        while read i
-        do
-
-                result=$(factor "$i")
-                check_factor $result
-
-        done < "$1"
+	while read line
+	do
+		result=$(factor "$line")
+		is_factor $result
+	done < "$1"
 fi
-                    if revnumber % i == 0:
-                        print("{}={}*{}".format(revnumber, revnumber // i, i))
-                        break
-                    i = i + 2
-                if i == (revnumber // 2) + 1:
-                    print("{}={}*{}".format(revnumber, revnumber, 1))
-    except (IndexError):
-        pass
-
-
-# autostart
-fc()
